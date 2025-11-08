@@ -1,0 +1,54 @@
+{
+  "state": "QUESTIONING",
+  "task_description": "VR setup",
+  "workflow_id": "96e2f255",
+  "questions": {
+    "summary": "Need clarification on VR setup",
+    "questions": [
+      {
+        "id": "Q1",
+        "text": "What type of VR headset do you have?",
+        "priority": "CRITICAL",
+        "type": "TECHNICAL",
+        "context": "Different headsets need different apps",
+        "default_answer": "Google Cardboard",
+        "dependencies": []
+      },
+      {
+        "id": "Q2",
+        "text": "Where are your movies stored?",
+        "priority": "CRITICAL",
+        "type": "REQUIREMENT",
+        "context": "Determines streaming vs transfer approach",
+        "default_answer": "On the laptop",
+        "dependencies": []
+      }
+    ],
+    "can_proceed_without_answers": false
+  },
+  "answers": {},
+  "plan": null,
+  "execution_log": [],
+  "metadata": {
+    "task_context": {},
+    "created_at": "2025-11-09T01:22:42.602148",
+    "state_durations": {
+      "INIT": 0.0,
+      "ANALYZING": 0.001
+    },
+    "last_updated": "2025-11-09T01:22:42.606410",
+    "analysis": {
+      "task_clarity_score": 60,
+      "technical_completeness_score": 50,
+      "should_ask_questions": true,
+      "identified_gaps": [
+        "VR headset type unclear",
+        "Content source unclear"
+      ],
+      "assumptions_made": [],
+      "next_state": "QUESTIONING",
+      "reasoning": "Need clarification on setup"
+    },
+    "assumptions": []
+  }
+}

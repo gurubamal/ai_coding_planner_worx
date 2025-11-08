@@ -1,11 +1,59 @@
 # CLI Planner AI - Fixes Applied
 
 ## Summary
-Fixed critical syntax error in `run_planner.sh` that was preventing the script from executing.
+Fixed two critical bugs:
+1. **Question Auto-Fill Bug** - System was auto-filling default answers and skipping user prompts even when `can_proceed_without_answers: false`
+2. **Shell Script Syntax Error** - Unclosed heredoc in `run_planner.sh` preventing script execution
 
 ## Issues Found and Fixed
 
-### 1. **run_planner.sh - Unclosed HERE-document (CRITICAL)**
+### 1. **cli_planner_bridge.py - Question Auto-Fill Bug (CRITICAL)**
+
+**Issue:**
+- Lines 584-585: The `_collect_answers()` method was auto-filling default answers even when `can_proceed_without_answers` was `false`
+- When the questioner set `can_proceed_without_answers: false`, it indicates user input IS required
+- However, if questions had `default_answer` values, the buggy logic would:
+  ```python
+  if question.default_answer:
+      answers[question.id] = question.default_answer  # Auto-filled without asking!
+  ```
+- This caused the system to skip user prompts entirely and proceed with defaults automatically
+- Example: In workflow `5ea99b9a`, 5 questions were generated with `can_proceed_without_answers: false`, but all had defaults and were auto-filled without user interaction
+
+**Expected Behavior:**
+- When `can_proceed_without_answers: true` → Use defaults automatically (no user input needed)
+- When `can_proceed_without_answers: false` → Always prompt user (defaults shown but user must confirm)
+
+**Fix Applied:**
+```python
+# OLD (BUGGY):
+if question.default_answer:
+    answers[question.id] = question.default_answer
+else:
+    missing.append(question)
+
+# NEW (FIXED):
+# When can_proceed_without_answers=False, we need to prompt the user
+# even if defaults exist (defaults are only used if user skips)
+missing.append(question)
+```
+
+**Impact:**
+- Users now receive interactive prompts when the AI determines clarification is critical
+- Defaults are still available during prompts (user can press Enter to accept)
+- In non-interactive mode (pipes), system returns `QUESTIONING` state with proper message
+- Workflow transparency improved - user knows when input is truly optional vs required
+
+**Location:** `/home/vagrant/R/cli_planner_ai/cli_planner_bridge.py:573-586`
+
+**Testing:**
+- Created test fixture: `tests/data/test_defaults_require_prompt.json`
+- Verified fix with: Questions WITH defaults + `can_proceed_without_answers: false`
+- Result: System correctly enters `QUESTIONING` state and requests user input
+
+---
+
+### 2. **run_planner.sh - Unclosed HERE-document (CRITICAL)**
 
 **Issue:**
 - Line 26: `cat << EOF` started a here-document for the usage() function
@@ -31,26 +79,35 @@ Fixed critical syntax error in `run_planner.sh` that was preventing the script f
 
 ## Verification Steps Completed
 
-1. **Bash Syntax Check** ✅
+1. **Question Auto-Fill Fix Verification** ✅
+   ```bash
+   # Test with can_proceed_without_answers=false and defaults present
+   export PLANNER_FAKE_RESPONSES_FILE="tests/data/test_defaults_require_prompt.json"
+   echo '{"task": "VR setup"}' | python3 cli_planner_bridge.py | jq '.state, .message'
+   # Result: "QUESTIONING", "Clarifications required..."
+   # ✅ Correctly stops for user input instead of auto-filling
+   ```
+
+2. **Bash Syntax Check** ✅
    ```bash
    bash -n run_planner.sh
    # No errors
    ```
 
-2. **Python Syntax Checks** ✅
+3. **Python Syntax Checks** ✅
    ```bash
    python3 -m py_compile cli_planner_bridge.py prompts.py schemas.py
    python3 -m py_compile tests/test_schemas.py
    # All passed
    ```
 
-3. **Script Execution Test** ✅
+4. **Script Execution Test** ✅
    ```bash
    ./run_planner.sh --help
    # Successfully displays help message
    ```
 
-4. **Dependencies Check** ✅
+5. **Dependencies Check** ✅
    - Claude CLI: Found at `/home/vagrant/.npm-global/bin/claude`
    - Python 3: Available
    - All required Python modules: Present
@@ -58,10 +115,10 @@ Fixed critical syntax error in `run_planner.sh` that was preventing the script f
 ## Files Status
 
 ### Fixed Files
+- ✅ `cli_planner_bridge.py` - Fixed question auto-fill logic in `_collect_answers()` method
 - ✅ `run_planner.sh` - Fixed unclosed heredoc and completed implementation
 
 ### Verified Files (No Issues)
-- ✅ `cli_planner_bridge.py` - Valid Python syntax
 - ✅ `prompts.py` - Valid Python syntax
 - ✅ `schemas.py` - Valid Python syntax
 - ✅ `tests/test_schemas.py` - Valid Python syntax
@@ -116,13 +173,16 @@ echo "Implement Trivy scanning" | python3 cli_planner_bridge.py
 
 ## Notes
 
-- All core functionality is intact
-- The fix was minimal and surgical - only added the missing EOF and completion logic
-- No changes to business logic or Python code were needed
+- All core functionality is intact and improved
+- Both fixes were surgical and targeted:
+  - Question auto-fill: 3 lines changed in `_collect_answers()` method
+  - Shell script: Added missing EOF and completion logic
+- Test fixture added: `tests/data/test_defaults_require_prompt.json`
 - All files pass syntax validation
+- Interactive questioning workflow now works as designed
 
 ---
 
 **Fixed by:** Claude Code
-**Date:** 2025-11-08
+**Date:** 2025-11-09 (Question bug), 2025-11-08 (Shell script)
 **Status:** ✅ COMPLETE

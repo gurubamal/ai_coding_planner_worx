@@ -1,0 +1,44 @@
+{
+  "state": "QUESTIONING",
+  "task_description": "Add database support",
+  "workflow_id": "58964909",
+  "questions": {
+    "summary": "Need DB selection",
+    "questions": [
+      {
+        "id": "Q1",
+        "text": "Which database should we target?",
+        "priority": "CRITICAL",
+        "type": "TECHNICAL",
+        "context": "Impacts ORM and migrations",
+        "default_answer": null,
+        "dependencies": []
+      }
+    ],
+    "can_proceed_without_answers": false
+  },
+  "answers": {},
+  "plan": null,
+  "execution_log": [],
+  "metadata": {
+    "task_context": {},
+    "created_at": "2025-11-09T01:15:44.301524",
+    "state_durations": {
+      "INIT": 0.0,
+      "ANALYZING": 0.002
+    },
+    "last_updated": "2025-11-09T01:15:44.305713",
+    "analysis": {
+      "task_clarity_score": 60,
+      "technical_completeness_score": 50,
+      "should_ask_questions": true,
+      "identified_gaps": [
+        "Need environment details"
+      ],
+      "assumptions_made": [],
+      "next_state": "QUESTIONING",
+      "reasoning": "Missing DB selection"
+    },
+    "assumptions": []
+  }
+}

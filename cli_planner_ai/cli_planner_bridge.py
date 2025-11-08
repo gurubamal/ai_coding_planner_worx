@@ -581,10 +581,9 @@ class PlannerEngine:
             if question_set.can_proceed_without_answers:
                 answers[question.id] = question.default_answer or ""
                 continue
-            if question.default_answer:
-                answers[question.id] = question.default_answer
-            else:
-                missing.append(question)
+            # When can_proceed_without_answers=False, we need to prompt the user
+            # even if defaults exist (defaults are only used if user skips)
+            missing.append(question)
 
         if not missing:
             self.context.answers = answers
