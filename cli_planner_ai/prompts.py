@@ -43,16 +43,20 @@ ANALYSIS FRAMEWORK:
 DECISION CRITERIA:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Skip to PLANNING if:**
-- Task clarity > 80 AND technical completeness > 75
-- All CRITICAL information is present
-- Reasonable defaults exist for unknowns
+**DEFAULT BEHAVIOR: Always go to QUESTIONING to gather clarifications**
+
+This ensures better planning by validating assumptions and clarifying requirements.
+
+**Skip to PLANNING only if:**
+- Task clarity = 100 AND technical completeness = 100
+- Task is trivial and requires no user input
+- Task is a retry with complete context already provided
 
 **Go to QUESTIONING if:**
-- Task clarity < 80 OR technical completeness < 75
-- Any CRITICAL information is missing
+- Task clarity < 100 OR technical completeness < 100 (most cases)
+- Any assumptions need validation (always true for complex tasks)
 - Multiple reasonable approaches exist (need user preference)
-- Significant assumptions need validation
+- Missing any technical details (environment, tools, constraints)
 
 RESPONSE FORMAT:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -69,11 +73,11 @@ Return ONLY valid JSON:
 }
 
 CRITICAL RULES:
-✓ Be decisive - don't ask questions unnecessarily
-✓ Only flag TRUE gaps, not nice-to-haves
-✓ Prefer reasonable assumptions over asking
-✓ Consider user's time and context
-✓ Skip questions if task is standard/routine
+✓ **PREFER QUESTIONING** - Better plans come from clarified requirements
+✓ Set should_ask_questions=true for any non-trivial task
+✓ Flag both critical gaps AND important clarifications
+✓ Questions improve plan quality - don't skip them
+✓ Only skip questioning for completely unambiguous, trivial tasks
 """
 
 
@@ -161,12 +165,13 @@ Return ONLY valid JSON matching QuestionSet schema:
 }
 
 CRITICAL RULES:
-✓ Limit to 3-5 questions (7 absolute max)
-✓ Every question must have a clear purpose
+✓ **ALWAYS generate 3-5 questions** (minimum 3, maximum 5 for best results)
+✓ Every question must clarify assumptions or fill knowledge gaps
 ✓ Provide sensible defaults for all non-CRITICAL questions
 ✓ Use proper priority ranking (not everything is HIGH!)
 ✓ Make questions self-contained and unambiguous
-✓ Avoid yes/no questions when specifics are needed
+✓ Focus on: technical choices, environment details, scope boundaries, validation approaches
+✓ Questions validate assumptions and prevent planning mistakes
 """
 
 
@@ -198,13 +203,14 @@ def build_questioner_prompt(
 {context_str}
 
 **Your Task:**
-Generate a minimal, prioritized set of questions to fill the critical gaps.
+Generate 3-5 prioritized questions to validate assumptions and clarify requirements.
 
 Remember:
-- Only ask what's truly needed
-- Provide defaults for everything
-- Rank priorities correctly
-- Keep it under 5 questions if possible
+- **Generate 3-5 questions** to improve plan quality
+- Even if gaps seem small, questions validate assumptions
+- Ask about: environment, tools, constraints, validation approach, scope
+- Provide defaults for all questions
+- Rank priorities correctly (use HIGH/MEDIUM for most, CRITICAL sparingly)
 
 Return the question set in the specified JSON format.
 """

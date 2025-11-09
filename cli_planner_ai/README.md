@@ -1,4 +1,4 @@
-# CLI Planner AI - AI Coding Planner & Questioning Framework BY Ram Nath Bamal
+# CLI Planner AI - AI Coding Planner & Questioning Framework
 
 A reusable AI-powered planning framework for any coding task. Features a clean state machine, strict JSON schemas, ranked question taxonomy, and ready-to-use system/user/critic prompts.
 
