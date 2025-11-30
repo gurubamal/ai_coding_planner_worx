@@ -1,1 +1,1 @@
-AI Coding Planner -- Free Version (By Ram Nath Bamal)
+AI Coding Planner (By Ram Nath Bamal) -- Free Version 
