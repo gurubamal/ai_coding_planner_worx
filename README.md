@@ -1,1 +1,1 @@
-AI Coding Planner (By Ram Nath Bamal) -- Free Version 
+AI Coding Planner (By Ram Nath Bamal) -- Community Support opensource tool 
